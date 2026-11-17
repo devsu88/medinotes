@@ -10,6 +10,15 @@ points to the sentence it came from**, and where **identifying data never reache
 
 ## What it does
 
+The demo follows a GP's day: **pick a patient → read a brief before the visit → paste or load the
+consultation → review the note → export the documents.**
+
+0. **Pre-visit brief.** The five fictitious patients live in `src/medinotes/data/patients.json`
+   (the demo's "database", nothing is stored). Given the reason for today's visit, the model picks
+   the relevant history, the therapy and allergies, and what to ask or check. Each point cites a
+   record id and quotes it; the quote is checked against *that* record, so a real quote attached to
+   the wrong record is flagged too. The model sees "7 anni fa", never a calendar date.
+
 ```text
 transcript ─▶ pseudonymize (local, rules) ─▶ LLM, structured output ─▶ verify quotes ─▶ restore ─▶ note
                   │                                                         │
@@ -80,7 +89,8 @@ uv run ruff check .
 
   One run, five short visits: it shows the pipeline works, not how it behaves on real consultations.
 
-The consultations are written by hand, fictitious, and use made-up identifiers. Five is a smoke
+The brief is checked in tests only (scripted model); I ran it on two patients with the real model and
+read the output, which is not a measurement. The consultations are written by hand, fictitious, and use made-up identifiers. Five is a smoke
 test, not a benchmark.
 
 ## Limitations
@@ -98,7 +108,8 @@ test, not a benchmark.
 ## Layout
 
 ```text
-src/medinotes/   pseudonymize · schema · verify · llm · pipeline · app · evaluate
+src/medinotes/   pseudonymize · schema · verify · llm · pipeline · brief · patients · app · evaluate
+src/medinotes/data/patients.json   five fictitious patients with 4-5 records each
 eval/cases.json  five fictitious consultations with gold labels
 web/             Next.js static export (Italian UI)
 tests/           pseudonymization, grounding, pipeline, API, evaluation

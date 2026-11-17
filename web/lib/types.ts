@@ -41,3 +41,40 @@ export function unsupportedCount(note: Note): number {
     note.medications.filter((m) => !m.supported || !m.dose_supported).length
   );
 }
+
+export interface RecordEntry {
+  id: string;
+  date: string;
+  type: string;
+  text: string;
+}
+
+export interface Patient {
+  id: string;
+  name: string;
+  birth_year: number;
+  sex: string;
+  problems: string[];
+  entries: RecordEntry[];
+}
+
+export interface BriefItem {
+  text: string;
+  record: string;
+  evidence: string;
+  supported: boolean;
+}
+
+export type BriefSection = 'relevant' | 'therapy' | 'to_check';
+
+export interface BriefResult {
+  brief: Record<BriefSection, BriefItem[]>;
+  sent_to_model: string;
+  redactions: Record<string, number>;
+}
+
+export const BRIEF_SECTIONS: [BriefSection, string][] = [
+  ['relevant', 'Rilevante per oggi'],
+  ['therapy', 'Terapia, allergie e intolleranze'],
+  ['to_check', 'Da chiedere o controllare'],
+];
