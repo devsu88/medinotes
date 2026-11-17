@@ -63,7 +63,7 @@ test, not a benchmark.
 ## Limitations
 
 - Pseudonymization is rule-based. It misses names that appear with no title and are not typed in
-  the form, cities and workplaces, rare dates formats and free-text identifiers. It reduces what
+  the form, cities and workplaces, unusual date formats and free-text identifiers. It reduces what
   leaves the machine; it does not anonymize.
 - Dates are replaced, so the model cannot do date arithmetic on them.
 - The quote check proves a statement is *quoted from* the transcript, not that the model
