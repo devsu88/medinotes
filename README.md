@@ -22,9 +22,12 @@ transcript ─▶ pseudonymize (local, rules) ─▶ LLM, structured output ─�
 3. **Deterministic grounding checks.** Each quote must literally occur in the transcript the model
    saw. A medication dose must only contain numbers that appear in the transcript. Anything that
    fails is flagged for the doctor instead of silently dropped.
-4. **Transparency.** The UI shows the exact text that was sent to the provider and how many values
+4. **Doctor review before export.** Every flagged item must be confirmed, edited or removed before
+   the chart note can be copied or downloaded; editing counts as confirmation. The doctor can also
+   add entries by hand. The chart note (Markdown) contains the reviewed text only, not the quotes.
+5. **Transparency.** The UI shows the exact text that was sent to the provider and how many values
    were replaced per kind.
-5. **Stateless.** No database, no accounts, nothing logged or stored. The visitor's own API key
+6. **Stateless.** No database, no accounts, nothing logged or stored. The visitor's own API key
    travels in a request header and is used for that single call.
 
 ## Run it
@@ -45,6 +48,7 @@ With Docker: `docker build -t medinotes . && docker run -p 8000:8000 medinotes`.
 
 ```bash
 uv run pytest        # no network, the model is replaced by a scripted fake
+(cd web && npm test) # review and export logic
 uv run ruff check .
 ```
 
@@ -78,6 +82,7 @@ test, not a benchmark.
 - Dates are replaced, so the model cannot do date arithmetic on them.
 - The quote check proves a statement is *quoted from* the transcript, not that the model
   *interpreted* it correctly. A real quote can still support a wrong conclusion.
+- The exported note is a draft to paste into the practice software. It is not a signed medical record.
 - Italian only, general-practice style consultations only, text input only (no audio yet).
 - The evaluation set is small and synthetic.
 
