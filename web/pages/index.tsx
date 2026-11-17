@@ -117,7 +117,7 @@ export default function Home() {
 
       <section className="mt-6 grid gap-4 md:grid-cols-3">
         <label className="block text-sm md:col-span-3">
-          Chiave API (compatibile OpenAI; resta nella memoria del browser e non viene salvata)
+          Chiave API OpenAI (resta nella memoria del browser e non viene salvata)
           <input
             type="password"
             autoComplete="off"

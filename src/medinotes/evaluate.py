@@ -1,6 +1,6 @@
 """Score the pipeline on the synthetic consultations in ``eval/cases.json``.
 
-``python -m medinotes.evaluate`` needs a real model (LLM_API_KEY, optional LLM_MODEL/LLM_BASE_URL).
+``python -m medinotes.evaluate`` needs a real model (OPENAI_API_KEY, optional LLM_MODEL).
 The scoring functions are pure, so they are tested without one.
 """
 
@@ -86,5 +86,5 @@ def evaluate(extractor: Extractor, cases: list[dict] | None = None) -> dict:
 
 
 if __name__ == "__main__":
-    key = os.environ["LLM_API_KEY"]
+    key = os.environ["OPENAI_API_KEY"]
     print(json.dumps(evaluate(OpenAICompatibleExtractor(key)), indent=2, ensure_ascii=False))

@@ -28,7 +28,7 @@ def create_note(
     x_llm_key: str | None = Header(default=None),
 ) -> Result:
     # The visitor supplies the key. A server-side key is only for local development.
-    api_key = x_llm_key or os.getenv("LLM_API_KEY")
+    api_key = x_llm_key or os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise HTTPException(status_code=401, detail="Missing API key (header X-LLM-Key).")
     names = [n for n in (request.patient_name, request.doctor_name) if n.strip()]

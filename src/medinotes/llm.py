@@ -30,11 +30,11 @@ class Extractor(Protocol):
 
 
 class OpenAICompatibleExtractor:
-    """Structured extraction through any OpenAI-compatible endpoint (OpenAI, OpenRouter, …)."""
+    """Structured extraction with the OpenAI API."""
 
-    def __init__(self, api_key: str, model: str | None = None, base_url: str | None = None):
-        self._client = OpenAI(api_key=api_key, base_url=base_url or os.getenv("LLM_BASE_URL") or None)
-        self._model = model or os.getenv("LLM_MODEL", "gpt-5-mini")
+    def __init__(self, api_key: str, model: str | None = None):
+        self._client = OpenAI(api_key=api_key)
+        self._model = model or os.getenv("LLM_MODEL", "gpt-6-luna")
 
     def extract(self, transcript: str) -> Note:
         completion = self._client.chat.completions.parse(
