@@ -2,10 +2,12 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html lang="it">
       <Head>
-        <title>Healthcare Consultation Assistant</title>
-        <meta name="description" content="AI-powered medical consultation summaries" />
+        <meta
+          name="description"
+          content="Note di visita strutturate e verificabili, con pseudonimizzazione locale prima di ogni chiamata al modello."
+        />
       </Head>
       <body>
         <Main />

@@ -1,10 +1,8 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'export',  // This exports static HTML/JS files
-  images: {
-    unoptimized: true  // Required for static export
-  }
+  output: 'export', // static HTML/JS, served by the FastAPI container
+  images: { unoptimized: true },
 };
 
 export default nextConfig;
