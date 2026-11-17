@@ -73,10 +73,8 @@ def test_api_lists_patients_and_builds_a_brief(monkeypatch):
 
     assert len(client.get("/api/patients").json()) == 5
     body = {"patient_id": "p2", "reason": "tosse"}
-    assert client.post("/api/brief", json=body).status_code == 401
-    assert (
-        client.post("/api/brief", json={**body, "patient_id": "nope"}, headers={"X-LLM-Key": "k"}).status_code
-        == 404
-    )
-    ok = client.post("/api/brief", json=body, headers={"X-LLM-Key": "k"})
+    assert client.post("/api/brief", json=body).status_code == 503  # no server key configured
+    monkeypatch.setenv("OPENAI_API_KEY", "server-key")
+    assert client.post("/api/brief", json={**body, "patient_id": "nope"}).status_code == 404
+    ok = client.post("/api/brief", json=body)
     assert ok.status_code == 200 and ok.json()["brief"]["therapy"][0]["supported"] is True

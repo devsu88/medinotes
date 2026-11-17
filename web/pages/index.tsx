@@ -40,14 +40,13 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json();
 }
 
-const post = (apiKey: string, body: unknown): RequestInit => ({
+const post = (body: unknown): RequestInit => ({
   method: 'POST',
-  headers: { 'Content-Type': 'application/json', 'X-LLM-Key': apiKey },
+  headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(body),
 });
 
 export default function Home() {
-  const [apiKey, setApiKey] = useState('');
   const [doctor, setDoctor] = useState('');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -99,7 +98,7 @@ export default function Home() {
   async function makeBrief() {
     if (!patient || !session) return;
     const result = await run('brief', () =>
-      call<BriefResult>('/api/brief', post(apiKey, { patient_id: patient.id, reason: session.reason })),
+      call<BriefResult>('/api/brief', post({ patient_id: patient.id, reason: session.reason })),
     );
     if (result) patch(patient.id, { brief: result });
   }
@@ -107,14 +106,13 @@ export default function Home() {
   async function makeNote() {
     if (!patient || !session) return;
     const result = await run('note', () =>
-      call<Result>('/api/notes', post(apiKey, { transcript: session.transcript, patient_name: patient.name, doctor_name: doctor })),
+      call<Result>('/api/notes', post({ transcript: session.transcript, patient_name: patient.name, doctor_name: doctor })),
     );
     if (result) patch(patient.id, { note: { result, review: startReview(result.note) }, tab: 'note' });
   }
 
   const meta = () => ({ patient: patient?.name ?? '', doctor, date: new Date().toLocaleDateString('it-IT') });
   const done = new Set(Object.entries(sessions).filter(([, s]) => s.note).map(([id]) => id));
-  const hasKey = apiKey.trim().length > 0;
 
   return (
     <div className="app">
@@ -130,8 +128,6 @@ export default function Home() {
           <SettingsMenu
             open={settingsOpen}
             onToggle={() => setSettingsOpen((o) => !o)}
-            apiKey={apiKey}
-            setApiKey={setApiKey}
             doctor={doctor}
             setDoctor={setDoctor}
           />
@@ -174,15 +170,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {!hasKey && (
-                <p className="notice info">
-                  Per generare scheda e note inserisci la tua chiave API OpenAI nelle{' '}
-                  <button type="button" className="link" onClick={() => setSettingsOpen(true)}>
-                    impostazioni
-                  </button>
-                  .
-                </p>
-              )}
               {error && (
                 <p role="alert" className="notice err">
                   {error}
@@ -195,7 +182,7 @@ export default function Home() {
                   setReason={(reason) => patch(patient.id, { reason })}
                   brief={session.brief}
                   busy={busy === 'brief'}
-                  canRun={hasKey && busy === null}
+                  canRun={busy === null}
                   onRun={makeBrief}
                 />
               )}
@@ -205,7 +192,7 @@ export default function Home() {
                   setTranscript={(transcript) => patch(patient.id, { transcript })}
                   sample={SAMPLES[patient.id]}
                   busy={busy === 'note'}
-                  canRun={hasKey && busy === null}
+                  canRun={busy === null}
                   onRun={makeNote}
                 />
               )}

@@ -1,11 +1,11 @@
-"""HTTP API. Stateless: nothing is stored, and the visitor's own API key travels in a header."""
+"""HTTP API. Stateless: nothing is stored. The model key lives only in the server environment."""
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
 
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -24,18 +24,20 @@ class NoteRequest(BaseModel):
     doctor_name: str = Field(default="", max_length=200)
 
 
-@app.post("/api/notes", response_model=Result)
-def create_note(
-    request: NoteRequest,
-    x_llm_key: str | None = Header(default=None),
-) -> Result:
-    # The visitor supplies the key. A server-side key is only for local development.
-    api_key = x_llm_key or os.getenv("OPENAI_API_KEY")
+def _extractor() -> OpenAICompatibleExtractor:
+    """The model client, with the server's own key (environment variable OPENAI_API_KEY)."""
+    api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        raise HTTPException(status_code=401, detail="Missing API key (header X-LLM-Key).")
+        raise HTTPException(status_code=503, detail="Servizio non configurato: manca la chiave del modello.")
+    return OpenAICompatibleExtractor(api_key)
+
+
+@app.post("/api/notes", response_model=Result)
+def create_note(request: NoteRequest) -> Result:
+    extractor = _extractor()
     names = [n for n in (request.patient_name, request.doctor_name) if n.strip()]
     try:
-        return run(request.transcript, OpenAICompatibleExtractor(api_key), names)
+        return run(request.transcript, extractor, names)
     except Exception as exc:  # surface provider errors without echoing any clinical text
         raise HTTPException(status_code=502, detail=f"Model call failed: {type(exc).__name__}") from exc
 
@@ -51,15 +53,13 @@ def patients() -> list[Patient]:
 
 
 @app.post("/api/brief", response_model=BriefResult)
-def create_brief(request: BriefRequest, x_llm_key: str | None = Header(default=None)) -> BriefResult:
-    api_key = x_llm_key or os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=401, detail="Missing API key (header X-LLM-Key).")
+def create_brief(request: BriefRequest) -> BriefResult:
+    extractor = _extractor()
     patient = get_patient(request.patient_id)
     if patient is None:
         raise HTTPException(status_code=404, detail="Unknown patient.")
     try:
-        return make_brief(patient, request.reason, OpenAICompatibleExtractor(api_key))
+        return make_brief(patient, request.reason, extractor)
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Model call failed: {type(exc).__name__}") from exc
 

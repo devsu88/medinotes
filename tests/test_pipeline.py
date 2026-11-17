@@ -35,15 +35,16 @@ def test_a_quote_the_model_invented_is_flagged_not_dropped():
     assert result.note.subjective[0].supported is True
 
 
-def test_api_returns_a_checked_note_and_requires_a_key(monkeypatch):
+def test_api_returns_a_checked_note_and_needs_a_server_key(monkeypatch):
     monkeypatch.setattr(app_module, "OpenAICompatibleExtractor", lambda key: ScriptedExtractor(good_note()))
-    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     client = TestClient(app_module.app)
     body = {"transcript": TRANSCRIPT, "patient_name": "Mario Rossi"}
 
-    assert client.post("/api/notes", json=body).status_code == 401
+    assert client.post("/api/notes", json=body).status_code == 503  # no server key configured
 
-    ok = client.post("/api/notes", json=body, headers={"X-LLM-Key": "visitor-key"})
+    monkeypatch.setenv("OPENAI_API_KEY", "server-key")
+    ok = client.post("/api/notes", json=body)
     assert ok.status_code == 200
     assert ok.json()["note"]["medications"][0]["name"] == "amoxicillina"
     assert "Rossi" not in ok.json()["sent_to_model"]
@@ -55,8 +56,9 @@ def test_provider_errors_do_not_echo_clinical_text(monkeypatch):
             raise RuntimeError(transcript)  # a provider error that quotes its input
 
     monkeypatch.setattr(app_module, "OpenAICompatibleExtractor", lambda key: Boom())
+    monkeypatch.setenv("OPENAI_API_KEY", "server-key")
     client = TestClient(app_module.app)
-    resp = client.post("/api/notes", json={"transcript": TRANSCRIPT}, headers={"X-LLM-Key": "k"})
+    resp = client.post("/api/notes", json={"transcript": TRANSCRIPT})
 
     assert resp.status_code == 502
     assert "tosse" not in resp.text and "RuntimeError" in resp.text

@@ -6,7 +6,7 @@ points to the sentence it came from**, and where **identifying data never reache
 > Demo project. It is **not a medical device**, it does not give diagnoses, and it must not be used
 > with real patient data. The interface is in Italian because the consultations are.
 
-**[Live demo](https://medinotes-taupe.vercel.app)**: paste your own OpenAI key (it is sent only with your request and never stored) and use fictitious data only.
+**[Live demo](https://medinotes-taupe.vercel.app)**: fictitious patients only. The model key lives in the server environment, so the demo is rate-limited (12 POST requests per minute per IP, set as a Vercel firewall rule).
 
 ## What it does
 
@@ -44,8 +44,8 @@ transcript ─▶ pseudonymize (local, rules) ─▶ LLM, structured output ─�
    draft.
 6. **Transparency.** The UI shows the exact text that was sent to the provider and how many values
    were replaced per kind.
-7. **Stateless.** No database, no accounts, nothing logged or stored. The visitor's own API key
-   travels in a request header and is used for that single call.
+7. **Stateless.** No database, no accounts, nothing logged or stored by the app. The model key is
+   the server's `OPENAI_API_KEY` and is never sent to or shown in the browser.
 
 ## Run it
 
@@ -55,9 +55,9 @@ cd web && npm install && npm run build && cd ..
 STATIC_DIR=web/out uv run uvicorn medinotes.app:app --port 8000
 ```
 
-Open `http://localhost:8000`, paste an OpenAI API key and load
-the sample visit. Set `LLM_MODEL` on the server to change the model (default `gpt-6-luna`).
-`OPENAI_API_KEY` is only a convenience for local development: a public deployment should not set it.
+Create `.env` with `OPENAI_API_KEY=…` and start the server with `uv run --env-file .env uvicorn …`.
+Open `http://localhost:8000`, pick a patient and load the sample visit. Set `LLM_MODEL` on the server to change the model (default `gpt-6-luna`).
+
 
 On Vercel (what the live demo runs): static UI from `web/out` plus `api/index.py` as a Python function, see `vercel.json`.
 
