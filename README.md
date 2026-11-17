@@ -25,9 +25,14 @@ transcript ─▶ pseudonymize (local, rules) ─▶ LLM, structured output ─�
 4. **Doctor review before export.** Every flagged item must be confirmed, edited or removed before
    the chart note can be copied or downloaded; editing counts as confirmation. The doctor can also
    add entries by hand. The chart note (Markdown) contains the reviewed text only, not the quotes.
-5. **Transparency.** The UI shows the exact text that was sent to the provider and how many values
+5. **Documents from the reviewed note.** The same reviewed data produces a chart note, a medication
+   list to copy into the practice software, and a referral letter (specialist and clinical question
+   are editable; the question is pre-filled from plan items that ask for a visit or tests). They are
+   templates over the doctor's own text, with no second model call, and each one states that it is a
+   draft.
+6. **Transparency.** The UI shows the exact text that was sent to the provider and how many values
    were replaced per kind.
-6. **Stateless.** No database, no accounts, nothing logged or stored. The visitor's own API key
+7. **Stateless.** No database, no accounts, nothing logged or stored. The visitor's own API key
    travels in a request header and is used for that single call.
 
 ## Run it

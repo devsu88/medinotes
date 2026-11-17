@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { exportNote, newItem, pendingCount, startReview } from './review.ts';
+import {
+  exportNote,
+  exportPrescriptionDraft,
+  exportReferral,
+  newItem,
+  pendingCount,
+  startReview,
+  suggestQuestion,
+} from './review.ts';
 import type { Note } from './types.ts';
 
 const fact = (text: string, supported = true) => ({ text, evidence: `q ${text}`, supported });
@@ -53,4 +61,36 @@ test('export keeps edited text, drops removed items and adds the doctor’s own'
 test('empty sections are left out', () => {
   const review = startReview({ ...NOTE, subjective: [], medications: [] });
   assert.doesNotMatch(exportNote(review, META), /## Soggettivo|## Farmaci/);
+});
+
+test('prescription draft lists the kept medications and says it is not a prescription', () => {
+  const review = startReview(NOTE);
+  review.sections.subjective[1].removed = true;
+  review.medications[1].confirmed = true;
+  const out = exportPrescriptionDraft(review, META);
+  assert.match(out, /1\. paracetamolo · 1000 mg\n2\. amoxicillina · 2 g/);
+  assert.match(out, /non è una ricetta/);
+});
+
+test('prescription draft is refused with unresolved items or without medications', () => {
+  assert.throws(() => exportPrescriptionDraft(startReview(NOTE), META), /da rivedere/);
+  assert.throws(() => exportPrescriptionDraft(startReview({ ...NOTE, subjective: [], medications: [] }), META), /Nessun farmaco/);
+});
+
+test('the suggested question picks plan items that ask for a visit or a test', () => {
+  const review = startReview({
+    ...NOTE,
+    plan: [fact('Ecografia addominale'), fact('Bere molto'), fact('Visita cardiologica')],
+  });
+  assert.equal(suggestQuestion(review), 'Ecografia addominale\nVisita cardiologica');
+});
+
+test('referral letter needs a question and carries history, findings and therapy', () => {
+  const review = startReview({ ...NOTE, subjective: [fact('Dolore toracico')], medications: [] });
+  assert.throws(() => exportReferral(review, META, { specialist: '', question: ' ' }), /quesito/);
+  const out = exportReferral(review, META, { specialist: 'cardiologo', question: 'Valutazione cardiologica' });
+  assert.match(out, /Al Collega, cardiologo,/);
+  assert.match(out, /Valutazione cardiologica/);
+  assert.match(out, /Anamnesi:\n- Dolore toracico/);
+  assert.doesNotMatch(out, /Terapia/); // no medications, no empty heading
 });

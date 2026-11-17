@@ -100,3 +100,76 @@ export function exportNote(review: Review, meta: ExportMeta): string {
   lines.push('Bozza generata con MediNotes e rivista dal medico.');
   return lines.join('\n') + '\n';
 }
+
+const header = (title: string, meta: ExportMeta) =>
+  [
+    title,
+    '',
+    ...(meta.patient.trim() ? [`Paziente: ${meta.patient.trim()}`] : []),
+    ...(meta.doctor.trim() ? [`Medico: ${meta.doctor.trim()}`] : []),
+    `Data: ${meta.date}`,
+    '',
+  ];
+
+const bullets = (items: Item[]) =>
+  kept(items)
+    .filter((i) => i.text.trim())
+    .map((i) => `- ${i.text.trim()}`);
+
+/** Medication list to copy into the practice software. A draft, never a prescription. */
+export function exportPrescriptionDraft(review: Review, meta: ExportMeta): string {
+  if (pendingCount(review) > 0) throw new Error('Ci sono elementi segnalati ancora da rivedere.');
+  const meds = kept(review.medications).filter((m) => m.name.trim());
+  if (!meds.length) throw new Error('Nessun farmaco da prescrivere.');
+  const lines = [
+    ...header('Bozza di prescrizione', meta),
+    ...meds.map(
+      (m, n) => `${n + 1}. ${[m.name, m.dose, m.instructions].map((p) => p.trim()).filter(Boolean).join(' · ')}`,
+    ),
+    '',
+    'Bozza da trascrivere nel gestionale: non è una ricetta e non ha valore prescrittivo.',
+  ];
+  return lines.join('\n') + '\n';
+}
+
+const REQUEST = /(visita|specialist|invio|mand|esam|ecograf|radiograf|risonanz|\btac\b|analisi)/i;
+
+/** Plan items that look like a request to a colleague or for tests: a starting point for the doctor. */
+export function suggestQuestion(review: Review): string {
+  return kept(review.sections.plan)
+    .map((i) => i.text.trim())
+    .filter((t) => REQUEST.test(t))
+    .join('\n');
+}
+
+export function exportReferral(
+  review: Review,
+  meta: ExportMeta,
+  letter: { specialist: string; question: string },
+): string {
+  if (pendingCount(review) > 0) throw new Error('Ci sono elementi segnalati ancora da rivedere.');
+  if (!letter.question.trim()) throw new Error('Scrivi il quesito clinico.');
+  const to = letter.specialist.trim();
+  const blocks: [string, string[]][] = [
+    ['Anamnesi', bullets(review.sections.subjective)],
+    ['Esame obiettivo', bullets(review.sections.objective)],
+    ['Valutazione', bullets(review.sections.assessment)],
+    [
+      'Terapia in corso o prescritta',
+      kept(review.medications)
+        .filter((m) => m.name.trim())
+        .map((m) => `- ${[m.name, m.dose, m.instructions].map((p) => p.trim()).filter(Boolean).join(' · ')}`),
+    ],
+  ];
+  const lines = [
+    ...header('Lettera di invio', meta),
+    to ? `Al Collega, ${to},` : 'Gentile Collega,',
+    '',
+    'ti invio il paziente per il seguente quesito clinico:',
+    letter.question.trim(),
+    '',
+    ...blocks.flatMap(([title, rows]) => (rows.length ? [`${title}:`, ...rows, ''] : [])),
+    'Cordiali saluti.',
+  ];
+  return lines.join('\n') + '\n';
+}

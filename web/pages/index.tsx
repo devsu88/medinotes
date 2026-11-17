@@ -1,7 +1,16 @@
 import Head from 'next/head';
 import { useState } from 'react';
 import { SAMPLE } from '../lib/sample';
-import { exportNote, newItem, newMedication, pendingCount, startReview } from '../lib/review';
+import {
+  exportNote,
+  exportPrescriptionDraft,
+  exportReferral,
+  newItem,
+  newMedication,
+  pendingCount,
+  startReview,
+  suggestQuestion,
+} from '../lib/review';
 import type { Item, MedItem, Review } from '../lib/review';
 import { SECTIONS } from '../lib/types';
 import type { Result, SectionKey } from '../lib/types';
@@ -52,6 +61,37 @@ function Actions({
   );
 }
 
+/** A generated document with a copy button. Shows the reason instead when it cannot be built yet. */
+function Document({ build }: { build: () => string }) {
+  const [copied, setCopied] = useState(false);
+  let text = '';
+  let problem = '';
+  try {
+    text = build();
+  } catch (e) {
+    problem = e instanceof Error ? e.message : 'Documento non disponibile';
+  }
+  if (problem) return <p className="mt-2 text-sm text-amber-700 dark:text-amber-300">{problem}</p>;
+  return (
+    <div className="mt-2">
+      <pre className="whitespace-pre-wrap rounded border border-slate-300 bg-white p-3 text-sm dark:border-slate-600 dark:bg-slate-900">
+        {text}
+      </pre>
+      <button
+        type="button"
+        className={`${linkButton} mt-1`}
+        onClick={async () => {
+          await navigator.clipboard.writeText(text);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        }}
+      >
+        {copied ? 'Copiato' : 'Copia'}
+      </button>
+    </div>
+  );
+}
+
 export default function Home() {
   const [apiKey, setApiKey] = useState('');
   const [patient, setPatient] = useState('');
@@ -62,12 +102,15 @@ export default function Home() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [specialist, setSpecialist] = useState('');
+  const [question, setQuestion] = useState<string | null>(null);
 
   async function generate() {
     setBusy(true);
     setError('');
     setResult(null);
     setReview(null);
+    setQuestion(null);
     try {
       const res = await fetch(`${API}/api/notes`, {
         method: 'POST',
@@ -111,9 +154,8 @@ export default function Home() {
     setReview((r) => r && { ...r, sections: { ...r.sections, [key]: [...r.sections[key], newItem()] } });
   }
 
-  function exportText(): string {
-    return exportNote(review!, { patient, doctor, date: new Date().toLocaleDateString('it-IT') });
-  }
+  const meta = () => ({ patient, doctor, date: new Date().toLocaleDateString('it-IT') });
+  const exportText = () => exportNote(review!, meta());
 
   async function copyNote() {
     await navigator.clipboard.writeText(exportText());
@@ -321,6 +363,41 @@ export default function Home() {
               >
                 Scarica (.md)
               </button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              <details>
+                <summary className="cursor-pointer font-semibold">Bozza di prescrizione</summary>
+                <Document build={() => exportPrescriptionDraft(review, meta())} />
+              </details>
+              <details>
+                <summary className="cursor-pointer font-semibold">Lettera di invio allo specialista</summary>
+                <label className="mt-2 block text-sm">
+                  Specialista (es. cardiologo)
+                  <input
+                    className={field}
+                    value={specialist}
+                    onChange={(e) => setSpecialist(e.target.value)}
+                  />
+                </label>
+                <label className="mt-2 block text-sm">
+                  Quesito clinico
+                  <textarea
+                    className={field}
+                    rows={3}
+                    value={question ?? suggestQuestion(review)}
+                    onChange={(e) => setQuestion(e.target.value)}
+                  />
+                </label>
+                <Document
+                  build={() =>
+                    exportReferral(review, meta(), {
+                      specialist,
+                      question: question ?? suggestQuestion(review),
+                    })
+                  }
+                />
+              </details>
             </div>
 
             <div className="mt-6">
