@@ -10,7 +10,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from .brief import BriefResult, make_brief
 from .llm import OpenAICompatibleExtractor
+from .patients import Patient, get_patient, load_patients
 from .pipeline import Result, run
 
 app = FastAPI(title="MediNotes", docs_url=None, redoc_url=None)
@@ -35,6 +37,30 @@ def create_note(
     try:
         return run(request.transcript, OpenAICompatibleExtractor(api_key), names)
     except Exception as exc:  # surface provider errors without echoing any clinical text
+        raise HTTPException(status_code=502, detail=f"Model call failed: {type(exc).__name__}") from exc
+
+
+class BriefRequest(BaseModel):
+    patient_id: str
+    reason: str = Field(min_length=1, max_length=500)
+
+
+@app.get("/api/patients")
+def patients() -> list[Patient]:
+    return list(load_patients())
+
+
+@app.post("/api/brief", response_model=BriefResult)
+def create_brief(request: BriefRequest, x_llm_key: str | None = Header(default=None)) -> BriefResult:
+    api_key = x_llm_key or os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=401, detail="Missing API key (header X-LLM-Key).")
+    patient = get_patient(request.patient_id)
+    if patient is None:
+        raise HTTPException(status_code=404, detail="Unknown patient.")
+    try:
+        return make_brief(patient, request.reason, OpenAICompatibleExtractor(api_key))
+    except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Model call failed: {type(exc).__name__}") from exc
 
 
