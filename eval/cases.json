@@ -1,0 +1,199 @@
+[
+  {
+    "id": "bronchite",
+    "names": [
+      "Mario Rossi",
+      "Bianchi"
+    ],
+    "pii": [
+      "Mario",
+      "Rossi",
+      "Bianchi",
+      "10/12/1985",
+      "Garibaldi",
+      "333 1234567",
+      "RSSMRA85T10A562S"
+    ],
+    "transcript": "Medico: Buongiorno signor Mario Rossi, sono la dott.ssa Bianchi. Come va la tosse?\nPaziente: Persiste da dieci giorni, soprattutto di notte. Ieri avevo 37,8 di febbre.\nMedico: Controllo i dati: codice fiscale RSSMRA85T10A562S, nato il 10/12/1985, abita in via Garibaldi 12, telefono 333 1234567. Ha difficoltà a respirare?\nPaziente: No, solo un po' di fiato corto quando salgo le scale.\nMedico: Il torace è libero all'auscultazione, saturazione 97 per cento. Per ora direi una bronchite virale.\nMedico: Le prescrivo paracetamolo 1000 mg al bisogno, massimo tre volte al giorno. Beva molto e riposi.\nMedico: Se la febbre supera 38,5 o ha affanno a riposo mi richiami. Ci rivediamo tra una settimana.",
+    "gold": {
+      "reason": [
+        "tosse"
+      ],
+      "subjective": [
+        "37,8",
+        "fiato corto"
+      ],
+      "objective": [
+        "torace",
+        "97"
+      ],
+      "assessment": [
+        "bronchite"
+      ],
+      "plan": [
+        "una settimana"
+      ],
+      "medications": [
+        {
+          "name": "paracetamolo",
+          "dose": "1000"
+        }
+      ]
+    }
+  },
+  {
+    "id": "ipertensione",
+    "names": [
+      "Giulia Verdi",
+      "Neri"
+    ],
+    "pii": [
+      "Giulia",
+      "Verdi",
+      "Neri",
+      "22/05/1962",
+      "Roma 45",
+      "347 9876543"
+    ],
+    "transcript": "Medico: Buongiorno signora Giulia Verdi, sono il dottor Neri. È qui per il controllo della pressione?\nPaziente: Sì dottore. A casa mi risulta 150 su 95 da due settimane.\nMedico: Qui misuro 148 su 92. Il suo recapito è ancora il 347 9876543? E abita sempre in via Roma 45?\nPaziente: Sì, tutto uguale. Il 22/05/1962 sono nata, per il resto nessun cambiamento.\nMedico: Allora la pressione è ancora alta con la terapia attuale. Aumentiamo l'amlodipina da 5 a 10 mg una volta al giorno la mattina.\nMedico: Riduca il sale e controlli la pressione ogni giorno. Le prescrivo anche esami del sangue: creatinina e potassio.\nPaziente: Quando ci rivediamo?\nMedico: Tra un mese, con gli esami.",
+    "gold": {
+      "reason": [
+        "pressione"
+      ],
+      "subjective": [
+        "150"
+      ],
+      "objective": [
+        "148"
+      ],
+      "assessment": [
+        "alta"
+      ],
+      "plan": [
+        "esami",
+        "un mese"
+      ],
+      "medications": [
+        {
+          "name": "amlodipina",
+          "dose": "10"
+        }
+      ]
+    }
+  },
+  {
+    "id": "lombalgia",
+    "names": [
+      "Luca Ferrari",
+      "Conti"
+    ],
+    "pii": [
+      "Luca",
+      "Ferrari",
+      "Conti",
+      "3 marzo 2026",
+      "luca.ferrari@example.it"
+    ],
+    "transcript": "Medico: Buongiorno Luca Ferrari. Mi dica.\nPaziente: Dottoressa Conti, ho male alla schiena da tre giorni, da quando ho sollevato una scatola pesante il 3 marzo 2026.\nMedico: Il dolore scende lungo la gamba?\nPaziente: No, resta in basso a destra. Non ho formicolii né perdita di forza.\nMedico: All'esame c'è contrattura dei muscoli lombari, il Lasègue è negativo. Direi una lombalgia meccanica.\nMedico: Prenda ibuprofene 400 mg dopo i pasti, due volte al giorno per cinque giorni, e mantenga il movimento senza sforzi.\nMedico: Le mando il certificato via email a luca.ferrari@example.it. Se compare formicolio o debolezza alla gamba torni subito.",
+    "gold": {
+      "reason": [
+        "schiena"
+      ],
+      "subjective": [
+        "tre giorni"
+      ],
+      "objective": [
+        "contrattura",
+        "Lasègue"
+      ],
+      "assessment": [
+        "lombalgia"
+      ],
+      "plan": [
+        "certificato",
+        "formicolio"
+      ],
+      "medications": [
+        {
+          "name": "ibuprofene",
+          "dose": "400"
+        }
+      ]
+    }
+  },
+  {
+    "id": "diabete",
+    "names": [
+      "Anna Esposito",
+      "Greco"
+    ],
+    "pii": [
+      "Anna",
+      "Esposito",
+      "Greco",
+      "Mazzini",
+      "0612345678"
+    ],
+    "transcript": "Medico: Buongiorno signora Anna Esposito, sono il dottor Greco. Come sono andati i valori?\nPaziente: La glicemia a digiuno è stata tra 140 e 160 questo mese. Mi sento stanca e ho più sete.\nMedico: L'emoglobina glicata di ieri è 8,1. Ricordo che abita in via Mazzini 7 e il fisso è 0612345678.\nMedico: Il diabete non è ben controllato. Portiamo la metformina da 500 a 1000 mg due volte al giorno ai pasti.\nMedico: La mando dal diabetologo e dall'oculista per il fondo oculare. Rivediamo i valori tra tre mesi.",
+    "gold": {
+      "reason": [
+        "valori"
+      ],
+      "subjective": [
+        "stanca",
+        "sete"
+      ],
+      "objective": [
+        "8,1"
+      ],
+      "assessment": [
+        "diabete"
+      ],
+      "plan": [
+        "diabetologo",
+        "oculista",
+        "tre mesi"
+      ],
+      "medications": [
+        {
+          "name": "metformina",
+          "dose": "1000"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nessun-farmaco",
+    "names": [
+      "Paolo Marino",
+      "Russo"
+    ],
+    "pii": [
+      "Paolo",
+      "Marino",
+      "Russo",
+      "15/09/2010"
+    ],
+    "transcript": "Medico: Buongiorno, sono il dottor Russo. Lei è il papà di Paolo Marino, nato il 15/09/2010?\nPaziente: Sì. Paolo ha mal di gola da due giorni e un po' di febbre, 37,5.\nMedico: Faccio l'esame: la gola è arrossata, niente placche. Il tampone rapido è negativo.\nMedico: È un'infezione virale, non servono antibiotici. Deve bere e riposare. Se la febbre supera 38,5 per più di tre giorni mi richiami.",
+    "gold": {
+      "reason": [
+        "mal di gola"
+      ],
+      "subjective": [
+        "37,5"
+      ],
+      "objective": [
+        "arrossata",
+        "tampone"
+      ],
+      "assessment": [
+        "virale"
+      ],
+      "plan": [
+        "bere",
+        "tre giorni"
+      ],
+      "medications": []
+    }
+  }
+]
