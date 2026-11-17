@@ -6,6 +6,8 @@ points to the sentence it came from**, and where **identifying data never reache
 > Demo project. It is **not a medical device**, it does not give diagnoses, and it must not be used
 > with real patient data. The interface is in Italian because the consultations are.
 
+**[Live demo](https://medinotes-taupe.vercel.app)**: paste your own OpenAI key (it is sent only with your request and never stored) and use fictitious data only.
+
 ## What it does
 
 ```text
@@ -46,6 +48,8 @@ STATIC_DIR=web/out uv run uvicorn medinotes.app:app --port 8000
 Open `http://localhost:8000`, paste an OpenAI API key and load
 the sample visit. Set `LLM_MODEL` on the server to change the model (default `gpt-6-luna`).
 `OPENAI_API_KEY` is only a convenience for local development: a public deployment should not set it.
+
+On Vercel (what the live demo runs): static UI from `web/out` plus `api/index.py` as a Python function, see `vercel.json`.
 
 With Docker: `docker build -t medinotes . && docker run -p 8000:8000 medinotes`.
 
