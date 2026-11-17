@@ -1,13 +1,35 @@
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
-import { BriefView } from '../components/BriefView';
-import { NoteReview } from '../components/NoteReview';
-import { PatientPicker } from '../components/PatientPicker';
-import { field, linkButton, primaryButton } from '../components/styles';
+import { BriefTab } from '../components/BriefTab';
+import { ContextPanel } from '../components/ContextPanel';
+import { DocumentsTab } from '../components/DocumentsTab';
+import { NoteTab } from '../components/NoteTab';
+import { SettingsMenu } from '../components/SettingsMenu';
+import { Sidebar } from '../components/Sidebar';
+import { VisitTab } from '../components/VisitTab';
+import { startReview } from '../lib/review';
+import type { Review } from '../lib/review';
 import { SAMPLES } from '../lib/samples';
 import type { BriefResult, Patient, Result } from '../lib/types';
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? '';
+
+type Tab = 'brief' | 'visit' | 'note' | 'docs';
+
+const TABS: [Tab, string][] = [
+  ['brief', 'Scheda'],
+  ['visit', 'Visita'],
+  ['note', 'Nota'],
+  ['docs', 'Documenti'],
+];
+
+interface Session {
+  tab: Tab;
+  reason: string;
+  brief: BriefResult | null;
+  transcript: string;
+  note: { result: Result; review: Review } | null;
+}
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, init);
@@ -24,44 +46,41 @@ const post = (apiKey: string, body: unknown): RequestInit => ({
   body: JSON.stringify(body),
 });
 
-function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
-  return (
-    <section className="mt-10">
-      <h2 className="text-xl font-semibold">
-        <span className="mr-2 rounded-full bg-blue-600 px-2.5 py-0.5 text-sm text-white">{n}</span>
-        {title}
-      </h2>
-      <div className="mt-3">{children}</div>
-    </section>
-  );
-}
-
 export default function Home() {
   const [apiKey, setApiKey] = useState('');
   const [doctor, setDoctor] = useState('');
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [reason, setReason] = useState('');
-  const [brief, setBrief] = useState<BriefResult | null>(null);
-  const [transcript, setTranscript] = useState('');
-  const [note, setNote] = useState<{ key: number; result: Result } | null>(null);
+  const [sessions, setSessions] = useState<Record<string, Session>>({});
   const [error, setError] = useState('');
   const [busy, setBusy] = useState<'brief' | 'note' | null>(null);
 
   useEffect(() => {
     call<Patient[]>('/api/patients')
-      .then(setPatients)
+      .then((list) => {
+        setPatients(list);
+        setSelectedId(list[0]?.id ?? null);
+      })
       .catch(() => setError('Impossibile caricare i pazienti di esempio.'));
   }, []);
 
   const patient = patients.find((p) => p.id === selectedId) ?? null;
+  const session: Session | null = patient
+    ? (sessions[patient.id] ?? { tab: 'brief', reason: patient.appointment_reason, brief: null, transcript: '', note: null })
+    : null;
 
-  function select(id: string) {
-    setSelectedId(id);
-    setBrief(null);
-    setNote(null);
-    setTranscript('');
-    setError('');
+  function patch(id: string, change: Partial<Session>) {
+    setSessions((all) => {
+      const p = patients.find((x) => x.id === id)!;
+      const current = all[id] ?? { tab: 'brief', reason: p.appointment_reason, brief: null, transcript: '', note: null };
+      return { ...all, [id]: { ...current, ...change } };
+    });
+  }
+
+  function setReview(update: (r: Review) => Review) {
+    if (!patient || !session?.note) return;
+    patch(patient.id, { note: { ...session.note, review: update(session.note.review) } });
   }
 
   async function run<T>(kind: 'brief' | 'note', work: () => Promise<T>): Promise<T | null> {
@@ -78,142 +97,145 @@ export default function Home() {
   }
 
   async function makeBrief() {
-    setBrief(null);
+    if (!patient || !session) return;
     const result = await run('brief', () =>
-      call<BriefResult>('/api/brief', post(apiKey, { patient_id: patient!.id, reason })),
+      call<BriefResult>('/api/brief', post(apiKey, { patient_id: patient.id, reason: session.reason })),
     );
-    if (result) setBrief(result);
+    if (result) patch(patient.id, { brief: result });
   }
 
   async function makeNote() {
-    setNote(null);
+    if (!patient || !session) return;
     const result = await run('note', () =>
-      call<Result>(
-        '/api/notes',
-        post(apiKey, { transcript, patient_name: patient!.name, doctor_name: doctor }),
-      ),
+      call<Result>('/api/notes', post(apiKey, { transcript: session.transcript, patient_name: patient.name, doctor_name: doctor })),
     );
-    if (result) setNote((n) => ({ key: (n?.key ?? 0) + 1, result }));
+    if (result) patch(patient.id, { note: { result, review: startReview(result.note) }, tab: 'note' });
   }
 
+  const meta = () => ({ patient: patient?.name ?? '', doctor, date: new Date().toLocaleDateString('it-IT') });
+  const done = new Set(Object.entries(sessions).filter(([, s]) => s.note).map(([id]) => id));
   const hasKey = apiKey.trim().length > 0;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <div className="app">
       <Head>
         <title>MediNotes</title>
       </Head>
-      <h1 className="text-3xl font-bold">MediNotes</h1>
-      <p className="mt-1 text-slate-600 dark:text-slate-400">
-        Dalla cartella del paziente alla nota di visita: una scheda prima dell&apos;appuntamento, la nota
-        dalla trascrizione, e i documenti pronti da rivedere. Ogni affermazione rimanda alla frase da cui
-        nasce.
-      </p>
-      <p
-        role="note"
-        className="mt-4 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
-      >
-        Demo dimostrativa: <strong>non è un dispositivo medico</strong> e non sostituisce il giudizio del
-        medico. I pazienti sono fittizi: usa solo dati fittizi anche nelle trascrizioni. Nomi, codici
-        fiscali, date, indirizzi e telefoni vengono sostituiti sul server prima della chiamata al modello,
-        ma il filtro è basato su regole e non garantisce l&apos;anonimato.
-      </p>
-
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <label className="block text-sm md:col-span-2">
-          Chiave API OpenAI (resta nella memoria del browser e non viene salvata)
-          <input
-            type="password"
-            autoComplete="off"
-            className={field}
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
+      <header className="topbar">
+        <span className="logo">
+          MEDI<b>NOTES</b>
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <small>Demo con pazienti fittizi</small>
+          <SettingsMenu
+            open={settingsOpen}
+            onToggle={() => setSettingsOpen((o) => !o)}
+            apiKey={apiKey}
+            setApiKey={setApiKey}
+            doctor={doctor}
+            setDoctor={setDoctor}
           />
-        </label>
-        <label className="block text-sm">
-          Nome del medico (opzionale)
-          <input className={field} value={doctor} onChange={(e) => setDoctor(e.target.value)} />
-        </label>
+        </span>
+      </header>
+
+      <div className="body">
+        <Sidebar patients={patients} selected={selectedId} done={done} onSelect={setSelectedId} />
+
+        <main className="work">
+          {patient && session ? (
+            <>
+              <div className="head">
+                <div>
+                  <h1>{patient.name}</h1>
+                  <div className="tags">
+                    <span className="tag">
+                      {new Date().getFullYear() - patient.birth_year} anni · {patient.sex === 'F' ? 'donna' : 'uomo'}
+                    </span>
+                    {patient.problems.map((p) => (
+                      <span key={p} className="tag">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="tabs" role="tablist">
+                {TABS.map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={session.tab === key}
+                    onClick={() => patch(patient.id, { tab: key })}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {!hasKey && (
+                <p className="notice info">
+                  Per generare scheda e note inserisci la tua chiave API OpenAI nelle{' '}
+                  <button type="button" className="link" onClick={() => setSettingsOpen(true)}>
+                    impostazioni
+                  </button>
+                  .
+                </p>
+              )}
+              {error && (
+                <p role="alert" className="notice err">
+                  {error}
+                </p>
+              )}
+
+              {session.tab === 'brief' && (
+                <BriefTab
+                  reason={session.reason}
+                  setReason={(reason) => patch(patient.id, { reason })}
+                  brief={session.brief}
+                  busy={busy === 'brief'}
+                  canRun={hasKey && busy === null}
+                  onRun={makeBrief}
+                />
+              )}
+              {session.tab === 'visit' && (
+                <VisitTab
+                  transcript={session.transcript}
+                  setTranscript={(transcript) => patch(patient.id, { transcript })}
+                  sample={SAMPLES[patient.id]}
+                  busy={busy === 'note'}
+                  canRun={hasKey && busy === null}
+                  onRun={makeNote}
+                />
+              )}
+              {session.tab === 'note' &&
+                (session.note ? (
+                  <NoteTab review={session.note.review} setReview={setReview} result={session.note.result} meta={meta} />
+                ) : (
+                  <p className="notice info">Genera prima la nota dalla trascrizione, nella scheda Visita.</p>
+                ))}
+              {session.tab === 'docs' &&
+                (session.note ? (
+                  <DocumentsTab review={session.note.review} setReview={setReview} meta={meta} />
+                ) : (
+                  <p className="notice info">I documenti si preparano dalla nota rivista: genera prima la nota.</p>
+                ))}
+
+              <p className="disclaimer">
+                Demo dimostrativa con pazienti fittizi: usa solo dati fittizi. Non è un dispositivo medico e non
+                sostituisce il giudizio del medico. Nomi, codici fiscali, date, indirizzi e telefoni vengono sostituiti
+                sul server prima della chiamata al modello, ma il filtro è basato su regole e non garantisce
+                l&apos;anonimato.
+              </p>
+            </>
+          ) : (
+            <p>Caricamento…</p>
+          )}
+        </main>
+
+        {patient && <ContextPanel patient={patient} brief={session?.brief ?? null} />}
       </div>
-      {error && (
-        <p role="alert" className="mt-3 text-red-700 dark:text-red-300">
-          {error}
-        </p>
-      )}
-
-      <Step n={1} title="Scegli il paziente">
-        <PatientPicker patients={patients} selected={selectedId} onSelect={select} />
-      </Step>
-
-      {patient && (
-        <Step n={2} title="Scheda prima della visita">
-          <details>
-            <summary className="cursor-pointer text-sm font-medium">
-              Cartella di {patient.name} ({patient.entries.length} record)
-            </summary>
-            <ul className="mt-2 space-y-2 text-sm">
-              {patient.entries.map((e) => (
-                <li key={e.id}>
-                  <strong>{e.id}</strong> · {new Date(e.date).toLocaleDateString('it-IT')} · {e.type}
-                  <br />
-                  {e.text}
-                </li>
-              ))}
-            </ul>
-          </details>
-          <label className="mt-4 block text-sm">
-            Motivo della visita di oggi
-            <input
-              className={field}
-              value={reason}
-              placeholder="es. tosse e febbre da tre giorni"
-              onChange={(e) => setReason(e.target.value)}
-            />
-          </label>
-          <button
-            type="button"
-            onClick={makeBrief}
-            disabled={busy !== null || !hasKey || !reason.trim()}
-            className={`${primaryButton} mt-3`}
-          >
-            {busy === 'brief' ? 'Preparo la scheda…' : 'Prepara la scheda'}
-          </button>
-          {brief && <BriefView result={brief} />}
-        </Step>
-      )}
-
-      {patient && (
-        <Step n={3} title="Visita">
-          <div className="flex items-center justify-between text-sm">
-            <label htmlFor="transcript">Trascrizione della visita</label>
-            {SAMPLES[patient.id] && (
-              <button type="button" className={linkButton} onClick={() => setTranscript(SAMPLES[patient.id])}>
-                Carica una visita di esempio
-              </button>
-            )}
-          </div>
-          <textarea
-            id="transcript"
-            className={`${field} mt-1 h-56 font-mono`}
-            value={transcript}
-            onChange={(e) => setTranscript(e.target.value)}
-          />
-          <button
-            type="button"
-            onClick={makeNote}
-            disabled={busy !== null || !hasKey || !transcript.trim()}
-            className={`${primaryButton} mt-3`}
-          >
-            {busy === 'note' ? 'Elaborazione…' : 'Genera la nota'}
-          </button>
-        </Step>
-      )}
-
-      {patient && note && (
-        <Step n={4} title="Nota, revisione e documenti">
-          <NoteReview key={note.key} result={note.result} patient={patient.name} doctor={doctor} />
-        </Step>
-      )}
-    </main>
+    </div>
   );
 }

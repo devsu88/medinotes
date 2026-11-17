@@ -25,6 +25,9 @@ class Patient(BaseModel):
     birth_year: int
     sex: str
     problems: list[str]
+    alerts: list[str]  # shown permanently next to the patient, written from the records
+    appointment_time: str
+    appointment_reason: str
     entries: list[Entry]
 
 

@@ -55,6 +55,9 @@ export interface Patient {
   birth_year: number;
   sex: string;
   problems: string[];
+  alerts: string[];
+  appointment_time: string;
+  appointment_reason: string;
   entries: RecordEntry[];
 }
 

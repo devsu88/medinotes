@@ -1,53 +1,189 @@
 [
   {
-    "id": "p1", "name": "Giulia Verdi", "birth_year": 1962, "sex": "F",
-    "problems": ["Ipertensione", "Dislipidemia"],
+    "id": "p1",
+    "name": "Giulia Verdi",
+    "birth_year": 1962,
+    "sex": "F",
+    "problems": [
+      "Ipertensione",
+      "Dislipidemia"
+    ],
     "entries": [
-      {"date": "2025-11-04", "type": "visita", "text": "Prima diagnosi di ipertensione: pressione 152/96 su tre misure. Avviata amlodipina 5 mg al mattino. Consigliata dieta con poco sale."},
-      {"date": "2026-01-20", "type": "esame", "text": "Colesterolo totale 248, LDL 162, HDL 48, trigliceridi 140. Creatinina 0,8, potassio 4,2. Glicemia 92."},
-      {"date": "2026-01-27", "type": "visita", "text": "Pressione 138/88 in terapia. Per il colesterolo alto proposta prima la dieta. La paziente riferisce tosse secca dopo un ramipril provato in passato: da non riprendere."},
-      {"date": "2026-06-10", "type": "visita", "text": "Pressione a casa 145/92 nelle ultime settimane. Lamenta gonfiore alle caviglie la sera. Si conferma amlodipina 5 mg."},
-      {"date": "2026-09-02", "type": "esame", "text": "Colesterolo LDL 148 dopo la dieta. Creatinina 0,9, potassio 4,3."}
+      {
+        "date": "2025-11-04",
+        "type": "visita",
+        "text": "Prima diagnosi di ipertensione: pressione 152/96 su tre misure. Avviata amlodipina 5 mg al mattino. Consigliata dieta con poco sale."
+      },
+      {
+        "date": "2026-01-20",
+        "type": "esame",
+        "text": "Colesterolo totale 248, LDL 162, HDL 48, trigliceridi 140. Creatinina 0,8, potassio 4,2. Glicemia 92."
+      },
+      {
+        "date": "2026-01-27",
+        "type": "visita",
+        "text": "Pressione 138/88 in terapia. Per il colesterolo alto proposta prima la dieta. La paziente riferisce tosse secca dopo un ramipril provato in passato: da non riprendere."
+      },
+      {
+        "date": "2026-06-10",
+        "type": "visita",
+        "text": "Pressione a casa 145/92 nelle ultime settimane. Lamenta gonfiore alle caviglie la sera. Si conferma amlodipina 5 mg."
+      },
+      {
+        "date": "2026-09-02",
+        "type": "esame",
+        "text": "Colesterolo LDL 148 dopo la dieta. Creatinina 0,9, potassio 4,3."
+      }
+    ],
+    "appointment_time": "09:00",
+    "appointment_reason": "Controllo pressione",
+    "alerts": [
+      "Intolleranza al ramipril (tosse secca): non riprendere"
     ]
   },
   {
-    "id": "p2", "name": "Mario Rossi", "birth_year": 1985, "sex": "M",
-    "problems": ["Asma lieve", "Fumatore"],
+    "id": "p2",
+    "name": "Mario Rossi",
+    "birth_year": 1985,
+    "sex": "M",
+    "problems": [
+      "Asma lieve",
+      "Fumatore"
+    ],
     "entries": [
-      {"date": "2019-04-12", "type": "visita", "text": "Eruzione cutanea diffusa dopo cinque giorni di amoxicillina. Diagnosi di allergia alle penicilline. Da evitare penicilline e derivati."},
-      {"date": "2025-03-18", "type": "visita", "text": "Tosse e fischi serali da tre settimane. Spirometria con reversibilità dopo broncodilatatore: asma lieve. Prescritto salbutamolo al bisogno."},
-      {"date": "2025-10-07", "type": "visita", "text": "Fuma circa dieci sigarette al giorno. Consigliata la sospensione del fumo, il paziente non è ancora pronto. Usa il salbutamolo due volte a settimana."},
-      {"date": "2026-02-24", "type": "visita", "text": "Bronchite acuta virale, nessun antibiotico. Paracetamolo al bisogno. Saturazione 98 per cento."}
+      {
+        "date": "2019-04-12",
+        "type": "visita",
+        "text": "Eruzione cutanea diffusa dopo cinque giorni di amoxicillina. Diagnosi di allergia alle penicilline. Da evitare penicilline e derivati."
+      },
+      {
+        "date": "2025-03-18",
+        "type": "visita",
+        "text": "Tosse e fischi serali da tre settimane. Spirometria con reversibilità dopo broncodilatatore: asma lieve. Prescritto salbutamolo al bisogno."
+      },
+      {
+        "date": "2025-10-07",
+        "type": "visita",
+        "text": "Fuma circa dieci sigarette al giorno. Consigliata la sospensione del fumo, il paziente non è ancora pronto. Usa il salbutamolo due volte a settimana."
+      },
+      {
+        "date": "2026-02-24",
+        "type": "visita",
+        "text": "Bronchite acuta virale, nessun antibiotico. Paracetamolo al bisogno. Saturazione 98 per cento."
+      }
+    ],
+    "appointment_time": "09:30",
+    "appointment_reason": "Tosse e febbre da tre giorni",
+    "alerts": [
+      "Allergia alle penicilline: evitare amoxicillina e derivati"
     ]
   },
   {
-    "id": "p3", "name": "Anna Esposito", "birth_year": 1958, "sex": "F",
-    "problems": ["Diabete di tipo 2", "Sovrappeso"],
+    "id": "p3",
+    "name": "Anna Esposito",
+    "birth_year": 1958,
+    "sex": "F",
+    "problems": [
+      "Diabete di tipo 2",
+      "Sovrappeso"
+    ],
     "entries": [
-      {"date": "2024-05-14", "type": "visita", "text": "Diagnosi di diabete di tipo 2: glicemia a digiuno 148, emoglobina glicata 7,4. Avviata metformina 500 mg due volte al giorno ai pasti."},
-      {"date": "2025-09-30", "type": "esame", "text": "Emoglobina glicata 7,9. Creatinina 0,9, filtrato glomerulare nella norma. Microalbuminuria assente."},
-      {"date": "2026-03-17", "type": "visita", "text": "Glicemie domiciliari tra 130 e 150. Nessun sintomo. Fondo oculare eseguito un anno fa con esito normale: da ripetere nel 2026."},
-      {"date": "2026-08-25", "type": "esame", "text": "Emoglobina glicata 8,1. Colesterolo LDL 112. Peso 82 kg, aumentato di tre chili in sei mesi."}
+      {
+        "date": "2024-05-14",
+        "type": "visita",
+        "text": "Diagnosi di diabete di tipo 2: glicemia a digiuno 148, emoglobina glicata 7,4. Avviata metformina 500 mg due volte al giorno ai pasti."
+      },
+      {
+        "date": "2025-09-30",
+        "type": "esame",
+        "text": "Emoglobina glicata 7,9. Creatinina 0,9, filtrato glomerulare nella norma. Microalbuminuria assente."
+      },
+      {
+        "date": "2026-03-17",
+        "type": "visita",
+        "text": "Glicemie domiciliari tra 130 e 150. Nessun sintomo. Fondo oculare eseguito un anno fa con esito normale: da ripetere nel 2026."
+      },
+      {
+        "date": "2026-08-25",
+        "type": "esame",
+        "text": "Emoglobina glicata 8,1. Colesterolo LDL 112. Peso 82 kg, aumentato di tre chili in sei mesi."
+      }
+    ],
+    "appointment_time": "10:00",
+    "appointment_reason": "Controllo del diabete",
+    "alerts": []
+  },
+  {
+    "id": "p4",
+    "name": "Luca Ferrari",
+    "birth_year": 1990,
+    "sex": "M",
+    "problems": [
+      "Lombalgia ricorrente"
+    ],
+    "entries": [
+      {
+        "date": "2024-11-12",
+        "type": "visita",
+        "text": "Lombalgia meccanica dopo sforzo. Lasègue negativo. Ibuprofene 400 mg dopo i pasti per cinque giorni, riposo relativo."
+      },
+      {
+        "date": "2025-07-08",
+        "type": "visita",
+        "text": "Nuovo episodio di lombalgia, simile al precedente. Dopo l'ibuprofene ha avuto bruciore di stomaco per due giorni."
+      },
+      {
+        "date": "2026-04-21",
+        "type": "esame",
+        "text": "Risonanza lombare: protrusione discale L4-L5 senza compressione radicolare."
+      },
+      {
+        "date": "2026-04-28",
+        "type": "visita",
+        "text": "Esito della risonanza discusso. Proposti esercizi di stabilizzazione e fisioterapia. Preferibile evitare i FANS per il bruciore di stomaco avuto in passato."
+      }
+    ],
+    "appointment_time": "10:30",
+    "appointment_reason": "Mal di schiena",
+    "alerts": [
+      "Bruciore di stomaco con i FANS: preferire alternative"
     ]
   },
   {
-    "id": "p4", "name": "Luca Ferrari", "birth_year": 1990, "sex": "M",
-    "problems": ["Lombalgia ricorrente"],
+    "id": "p5",
+    "name": "Carla Bruno",
+    "birth_year": 1948,
+    "sex": "F",
+    "problems": [
+      "Fibrillazione atriale",
+      "Ipertensione"
+    ],
     "entries": [
-      {"date": "2024-11-12", "type": "visita", "text": "Lombalgia meccanica dopo sforzo. Lasègue negativo. Ibuprofene 400 mg dopo i pasti per cinque giorni, riposo relativo."},
-      {"date": "2025-07-08", "type": "visita", "text": "Nuovo episodio di lombalgia, simile al precedente. Dopo l'ibuprofene ha avuto bruciore di stomaco per due giorni."},
-      {"date": "2026-04-21", "type": "esame", "text": "Risonanza lombare: protrusione discale L4-L5 senza compressione radicolare."},
-      {"date": "2026-04-28", "type": "visita", "text": "Esito della risonanza discusso. Proposti esercizi di stabilizzazione e fisioterapia. Preferibile evitare i FANS per il bruciore di stomaco avuto in passato."}
-    ]
-  },
-  {
-    "id": "p5", "name": "Carla Bruno", "birth_year": 1948, "sex": "F",
-    "problems": ["Fibrillazione atriale", "Ipertensione"],
-    "entries": [
-      {"date": "2025-02-11", "type": "visita", "text": "Fibrillazione atriale parossistica riscontrata all'elettrocardiogramma. Avviato apixaban 5 mg due volte al giorno. Prosegue bisoprololo 2,5 mg."},
-      {"date": "2025-12-09", "type": "visita", "text": "Caduta in casa senza traumi gravi. Pressione 118/70, lieve capogiro in piedi. Peso 58 kg, creatinina 1,2."},
-      {"date": "2026-05-19", "type": "esame", "text": "Emocromo normale, emoglobina 12,8. Creatinina 1,3. Frequenza cardiaca 64 al minuto."},
-      {"date": "2026-10-13", "type": "visita", "text": "Dice di avere dimenticato qualche dose di apixaban questo mese. Nessun sanguinamento. Rinforzata l'importanza dell'assunzione regolare."}
+      {
+        "date": "2025-02-11",
+        "type": "visita",
+        "text": "Fibrillazione atriale parossistica riscontrata all'elettrocardiogramma. Avviato apixaban 5 mg due volte al giorno. Prosegue bisoprololo 2,5 mg."
+      },
+      {
+        "date": "2025-12-09",
+        "type": "visita",
+        "text": "Caduta in casa senza traumi gravi. Pressione 118/70, lieve capogiro in piedi. Peso 58 kg, creatinina 1,2."
+      },
+      {
+        "date": "2026-05-19",
+        "type": "esame",
+        "text": "Emocromo normale, emoglobina 12,8. Creatinina 1,3. Frequenza cardiaca 64 al minuto."
+      },
+      {
+        "date": "2026-10-13",
+        "type": "visita",
+        "text": "Dice di avere dimenticato qualche dose di apixaban questo mese. Nessun sanguinamento. Rinforzata l'importanza dell'assunzione regolare."
+      }
+    ],
+    "appointment_time": "11:00",
+    "appointment_reason": "Controllo di routine",
+    "alerts": [
+      "In terapia anticoagulante (apixaban)"
     ]
   }
 ]

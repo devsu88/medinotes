@@ -94,3 +94,13 @@ test('referral letter needs a question and carries history, findings and therapy
   assert.match(out, /Anamnesi:\n- Dolore toracico/);
   assert.doesNotMatch(out, /Terapia/); // no medications, no empty heading
 });
+
+import { ageLabel, initials } from './age.ts';
+
+test('age labels are relative and initials come from the name', () => {
+  const today = new Date('2026-11-17');
+  assert.equal(ageLabel('2026-11-03', today), 'meno di un mese fa');
+  assert.equal(ageLabel('2026-08-20', today), '3 mesi fa');
+  assert.equal(ageLabel('2019-04-12', today), '7 anni fa');
+  assert.equal(initials('Giulia Verdi'), 'GV');
+});

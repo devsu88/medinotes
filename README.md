@@ -10,8 +10,9 @@ points to the sentence it came from**, and where **identifying data never reache
 
 ## What it does
 
-The demo follows a GP's day: **pick a patient → read a brief before the visit → paste or load the
-consultation → review the note → export the documents.**
+The demo is a small GP workspace: today's patients on the left, the open patient in the middle
+(**Scheda → Visita → Nota → Documenti**) and, always visible on the right, the patient's alerts
+(such as an allergy) and their record timeline. It works down to phone width.
 
 0. **Pre-visit brief.** The five fictitious patients live in `src/medinotes/data/patients.json`
    (the demo's "database", nothing is stored). Given the reason for today's visit, the model picks
